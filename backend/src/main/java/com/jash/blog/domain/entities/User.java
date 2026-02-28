@@ -37,6 +37,7 @@ public class User {
     //cascade = CascadeType.ALL --> This means:Any operation on User will propagate to Posts.
     //orphanRemoval --> ensure that if anything changes... it is changed in database as well
     @OneToMany(mappedBy = "author",cascade = CascadeType.ALL,orphanRemoval = true)//INVERSE SIDE
+    @Builder.Default
     private List<Post> posts = new ArrayList<>();
 
     @Column(nullable = false)

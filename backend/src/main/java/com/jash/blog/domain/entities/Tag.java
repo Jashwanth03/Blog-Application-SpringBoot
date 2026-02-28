@@ -4,7 +4,9 @@ package com.jash.blog.domain.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -23,6 +25,10 @@ public class Tag {
 
     @Column(nullable = false)
     private String name;
+
+    //NO CASCADE here as well.... independent lifecycles
+    @ManyToMany(mappedBy = "tags")
+    private Set<Post> posts = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
