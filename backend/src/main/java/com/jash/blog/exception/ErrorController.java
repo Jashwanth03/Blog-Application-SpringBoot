@@ -5,6 +5,7 @@ import com.jash.blog.domain.Dto.ApiErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -61,5 +62,15 @@ public class ErrorController {
                 ex.getMessage()
         );
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+        log.error("Caught an bad credentials exception", ex);
+        ApiErrorResponse error = new ApiErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Incorrect Username or Password"
+        );
+        return new ResponseEntity<>(error  , HttpStatus.UNAUTHORIZED);
     }
 }

@@ -1,0 +1,24 @@
+## Why Do This?
+
+Spring Security is **framework-agnostic** — it doesn't know you're using JPA, PostgreSQL, or that your users are in a `users` table.
+These two classes are the **bridge** you build to connect your app's data layer to Spring's auth machinery.
+```
+Login Request
+     ↓
+Spring Security calls loadUserByUsername(email)
+     ↓
+BlogUserDetailsService hits UserRepository → DB
+     ↓
+Returns BlogUserDetails (wrapping your User)
+     ↓
+Spring checks password, grants access
+
+<---------------------------------------->
+Think of it this way — Spring Security is like a security guard that knows how to check IDs but doesn't know where your employee list is stored.
+You're giving it two things:
+
+UserDetails → the format of the ID card Spring can read
+UserDetailsService → the employee directory it can search through
+
+These two interfaces exist so Spring Security stays completely decoupled from your database, your ORM, and your domain model.
+You could swap PostgreSQL for MongoDB tomorrow and only need to change BlogUserDetailsService.
