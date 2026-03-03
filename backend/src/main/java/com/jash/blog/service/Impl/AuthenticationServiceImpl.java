@@ -1,6 +1,7 @@
 package com.jash.blog.service.Impl;
 
 import com.jash.blog.service.AuthenticationService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -21,7 +22,6 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     //only job is to take credentials and verify them
@@ -30,7 +30,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Value("${jwt.secret}")
     private  String secretKey;
-    private Long jwtExpiryMs = 8400000L;
+    private final Long jwtExpiryMs = 8400000L;
 
     @Override
     public UserDetails authenticate(String email, String password) {
@@ -43,7 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     //token are used to carry identity of the user ,
-    // so that we dont need to validate the user everytime looking up in the DB / per request
+    // so that we don't need to validate the user everytime looking up in the DB / per request
     @Override
     public String generateToken(UserDetails userDetails) {
         Map<String,Object> claims = new HashMap<>();
@@ -54,6 +54,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .setExpiration(new Date((System.currentTimeMillis() + jwtExpiryMs)))
                 .signWith(getSigninngKey() , SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    @Override
+    public UserDetails validateToken(String token) {
+        String userName = extractUsername(token);
+
+        return userDetailsService.loadUserByUsername(userName);
+    }
+    //token comes in → signature is verified → username is extracted → full user object is loaded and returned.
+
+    private String extractUsername(String token){
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigninngKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
 
     private Key getSigninngKey(){

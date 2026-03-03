@@ -8,4 +8,6 @@ public interface AuthenticationService {
 
     String generateToken(UserDetails userDetails);
 
+    UserDetails validateToken(String token);
+
 }

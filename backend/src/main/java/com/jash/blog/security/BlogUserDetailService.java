@@ -9,8 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
+
 @RequiredArgsConstructor
-@Service
 //the bridge between Spring Security and your UserRepository
 public class BlogUserDetailService implements UserDetailsService { // connects data layer and security with authentication
 
@@ -20,7 +20,7 @@ public class BlogUserDetailService implements UserDetailsService { // connects d
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(email));
+                .orElseThrow(() -> new UsernameNotFoundException("username not found : " + email));
 
         return new BlogUserDetails(user);
     }
